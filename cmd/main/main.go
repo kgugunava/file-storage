@@ -1,10 +1,10 @@
 package main
 
 import (
+	"file-storage/internal/app"
 	
 )
 
 func main() {
-	connectToDatabase()
-	runServer()
+	app.RunApp()
 }

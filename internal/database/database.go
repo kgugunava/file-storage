@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"log"
+	"file-storage/internal/login"
 )
 
-func connectToDatabase() (*pgx.Conn, error){
+func ConnectToDatabase() (*pgx.Conn, error){
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:postgres@localhost:5432/filestorage")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
@@ -17,7 +18,7 @@ func connectToDatabase() (*pgx.Conn, error){
 	return conn, nil
 }
 
-func addUserToDatabase(conn pgx.Conn, user User) error{
+func AddUserToDatabase(conn pgx.Conn, user login.User) error{
 	userInDB, err1 := UserInDatabase(conn, user)
 	if (err1 != nil) {
 		return err1
@@ -39,7 +40,7 @@ func addUserToDatabase(conn pgx.Conn, user User) error{
 	return nil
 }
 
-func UserInDatabase(conn pgx.Conn, user User) (int, error) {
+func UserInDatabase(conn pgx.Conn, user login.User) (int, error) {
 	query := "SELECT * FROM users"
 	rows, err := conn.Query(context.Background(), query)
 	if err != nil {
@@ -49,7 +50,7 @@ func UserInDatabase(conn pgx.Conn, user User) (int, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var curUser User
+		var curUser login.User
 		var a int
 		err := rows.Scan(&a, &curUser.Login, &curUser.Password)
         if err != nil {
