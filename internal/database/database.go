@@ -2,14 +2,14 @@ package database
 
 import (
 	"context"
-	"os"
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"log"
-	"file-storage/internal/login"
+	"os"
+	"file-storage/internal/userstruct"
 )
 
-func ConnectToDatabase() (*pgx.Conn, error){
+func ConnectToDatabase() (*pgx.Conn, error) {
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:postgres@localhost:5432/filestorage")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
@@ -18,9 +18,9 @@ func ConnectToDatabase() (*pgx.Conn, error){
 	return conn, nil
 }
 
-func AddUserToDatabase(conn pgx.Conn, user login.User) error{
+func AddUserToDatabase(conn pgx.Conn, user userstruct.User) error {
 	userInDB, err1 := UserInDatabase(conn, user)
-	if (err1 != nil) {
+	if err1 != nil {
 		return err1
 	}
 	if userInDB == 1 {
@@ -29,35 +29,35 @@ func AddUserToDatabase(conn pgx.Conn, user login.User) error{
 	}
 	query := "INSERT INTO users (login, password) VALUES (@login, @password)"
 	args := pgx.NamedArgs{
-        "login": user.Login,
-        "password": user.Password,
-    }
+		"login":    user.Login,
+		"password": user.Password,
+	}
 	_, err := conn.Exec(context.Background(), query, args)
-    if err != nil {
-        log.Println("Error Inserting")
+	if err != nil {
+		log.Println("Error Inserting")
 		return err
-    }
+	}
 	return nil
 }
 
-func UserInDatabase(conn pgx.Conn, user login.User) (int, error) {
+func UserInDatabase(conn pgx.Conn, user userstruct.User) (int, error) {
 	query := "SELECT * FROM users"
 	rows, err := conn.Query(context.Background(), query)
 	if err != nil {
-        log.Printf("Error Querying")
-        return 0, err
-    }
+		log.Printf("Error Querying")
+		return 0, err
+	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var curUser login.User
+		var curUser userstruct.User
 		var a int
 		err := rows.Scan(&a, &curUser.Login, &curUser.Password)
-        if err != nil {
-            log.Printf("Error Fetching")
-            return 1, err
-        }
-		if (curUser.Login == user.Login) {
+		if err != nil {
+			log.Printf("Error Fetching")
+			return 1, err
+		}
+		if curUser.Login == user.Login {
 			return 1, nil
 		}
 	}

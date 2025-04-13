@@ -1,4 +1,4 @@
-package login
+package userstruct
 
 type User struct {
 	Id int
