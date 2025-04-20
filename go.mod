@@ -3,7 +3,9 @@ module file-storage
 go 1.23.3
 
 require (
+	github.com/caarlos0/env/v11 v11.3.1 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
+	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect

@@ -2,24 +2,30 @@ package database
 
 import (
 	"context"
+	"file-storage/internal/models"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"log"
 	"os"
-	"file-storage/internal/userstruct"
+	"github.com/jackc/pgx/v5"
+	"github.com/doug-martin/goqu/v9"
 )
 
-func ConnectToDatabase() (*pgx.Conn, error) {
+type Database struct {
+	Connection *pgx.Conn
+}
+
+func (db *Database) ConnectToDatabase() (*pgx.Conn, error) {
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:postgres@localhost:5432/filestorage")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		return nil, err
 	}
+	db.Connection = conn
 	return conn, nil
 }
 
-func AddUserToDatabase(conn pgx.Conn, user userstruct.User) error {
-	userInDB, err1 := UserInDatabase(conn, user)
+func (db Database) AddUserToDatabase(user models.User) error {
+	userInDB, err1 := db.IsUserInDatabase(user)
 	if err1 != nil {
 		return err1
 	}
@@ -27,12 +33,8 @@ func AddUserToDatabase(conn pgx.Conn, user userstruct.User) error {
 		log.Println("This user is already in Database!")
 		return nil
 	}
-	query := "INSERT INTO users (login, password) VALUES (@login, @password)"
-	args := pgx.NamedArgs{
-		"login":    user.Login,
-		"password": user.Password,
-	}
-	_, err := conn.Exec(context.Background(), query, args)
+	query, _, _:= goqu.Insert("users").Cols("login", "password").Vals(goqu.Vals{user.Login, user.Password}).ToSQL()
+	_, err := db.Connection.Exec(context.Background(), query)
 	if err != nil {
 		log.Println("Error Inserting")
 		return err
@@ -40,9 +42,9 @@ func AddUserToDatabase(conn pgx.Conn, user userstruct.User) error {
 	return nil
 }
 
-func UserInDatabase(conn pgx.Conn, user userstruct.User) (int, error) {
-	query := "SELECT * FROM users"
-	rows, err := conn.Query(context.Background(), query)
+func (db Database) IsUserInDatabase(user models.User) (int, error) {
+	query, _, _ := goqu.From("users").ToSQL()
+	rows, err := db.Connection.Query(context.Background(), query)
 	if err != nil {
 		log.Printf("Error Querying")
 		return 0, err
@@ -50,7 +52,7 @@ func UserInDatabase(conn pgx.Conn, user userstruct.User) (int, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var curUser userstruct.User
+		var curUser models.User
 		var a int
 		err := rows.Scan(&a, &curUser.Login, &curUser.Password)
 		if err != nil {

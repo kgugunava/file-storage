@@ -5,7 +5,7 @@ import (
 	"file-storage/internal/server"
 )
 
-func RunApp() {
-	database.ConnectToDatabase()
-	server.RunServer()
+func RunApp(db database.Database) {
+	db.ConnectToDatabase()
+	server.RunServer(db)
 }
