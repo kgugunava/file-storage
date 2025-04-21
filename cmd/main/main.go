@@ -1,8 +1,8 @@
 package main
 
 import (
-	"file-storage/internal/app"
-	"file-storage/internal/database"
+	"github.com/kgugunava/file-storage/internal/app"
+	"github.com/kgugunava/file-storage/internal/database"
 )
 
 func main() {

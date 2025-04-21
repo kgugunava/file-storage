@@ -2,10 +2,10 @@ package server
 
 import (
 	"github.com/kgugunava/file-storage/internal/database"
-	"file-storage/internal/register"
+	"github.com/kgugunava/file-storage/internal/register"
 	"net/http"
-	"file-storage/internal/auth"
-	"file-storage/internal/config"
+	"github.com/kgugunava/file-storage/internal/auth"
+	"github.com/kgugunava/file-storage/internal/config"
 	"github.com/labstack/echo/v4"
 	"fmt"
 )

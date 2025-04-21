@@ -1,10 +1,10 @@
 package register
 
 import (
-	"file-storage/internal/database"
+	"github.com/kgugunava/file-storage/internal/database"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"file-storage/internal/models"
+	"github.com/kgugunava/file-storage/internal/models"
 	"fmt"
 )
 

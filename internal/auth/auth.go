@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"file-storage/internal/models"
-	"file-storage/internal/database"
+	"github.com/kgugunava/file-storage/internal/models"
+	"github.com/kgugunava/file-storage/internal/database"
 	"github.com/labstack/echo/v4"
 	"github.com/golang-jwt/jwt/v5"
 	"time"

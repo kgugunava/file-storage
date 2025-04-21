@@ -1,8 +1,8 @@
 package app
 
 import (
-	"file-storage/internal/database"
-	"file-storage/internal/server"
+	"github.com/kgugunava/file-storage/internal/database"
+	"github.com/kgugunava/file-storage/internal/server"
 )
 
 func RunApp(db database.Database) {

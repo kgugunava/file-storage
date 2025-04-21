@@ -2,7 +2,7 @@ package database
 
 import (
 	"context"
-	"file-storage/internal/models"
+	"github.com/kgugunava/file-storage/internal/models"
 	"fmt"
 	"log"
 	"os"
