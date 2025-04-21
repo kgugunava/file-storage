@@ -1,4 +1,4 @@
-module file-storage
+module github.com/kgugunava/file-storage
 
 go 1.23.3
 

@@ -65,3 +65,24 @@ func (db Database) IsUserInDatabase(user models.User) (int, error) {
 	}
 	return 0, nil
 }
+
+func (db Database) CheckAuthRequest(user models.User) int {
+	query, _, _ := goqu.From("users").Where(goqu.Ex{"login" : user.Login}).ToSQL()
+	fmt.Print(query)
+	row, err := db.Connection.Query(context.Background(), query)
+	if err != nil {
+		log.Printf("Error Querying")
+		return 0
+	}
+	var checkUser models.User
+	err1 := row.Scan(&checkUser.Id, &checkUser.Login, &checkUser.Password)
+	fmt.Println(checkUser.Password)
+	if (err1 != nil) {
+		log.Printf("Error Fetching")
+		return 1
+	} 
+	if (checkUser.Password == user.Password) {
+		return 1
+	}
+	return 0
+}

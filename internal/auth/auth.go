@@ -7,10 +7,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 	"fmt"
+	"net/http"
 )
 
 type AuthRequest struct {
-	Login string `json:"email"`
+	Login string `json:"login"`
 	Password string `json:"password"`
 }
 
@@ -25,17 +26,15 @@ func generateJWT() string {
 }
 
 
-func Authenticate(c echo.Context) error{
+func Authenticate(c echo.Context, db database.Database) error {
 	request := new(AuthRequest)
-	currentUser := userstruct.User{Login: request.Login, Password: request.Password}
-	conn, err := database.ConnectToDatabase()
-	if err != nil {
-        log.Fatalf("Error : %v", err)
-    }
-	if database.UserInDatabase(conn, currentUser) == 1, nil {
+	c.Bind(request)
+	currentUser := models.User{Login: request.Login, Password: request.Password}
+	if db.CheckAuthRequest(currentUser) == 1 {
 		n := currentUser
 		fmt.Print(n.Login)
 		fmt.Print(n.Password)
-		database.AddUserToDatabase(conn, currentUser)
+		return c.NoContent(http.StatusOK)
 	}
+	return c.NoContent(http.StatusForbidden)
 }
