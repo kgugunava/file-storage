@@ -1,31 +1,30 @@
 package server
 
 import (
-	"log"
+	"github.com/kgugunava/file-storage/internal/database"
+	"github.com/kgugunava/file-storage/internal/register"
 	"net/http"
+	"github.com/kgugunava/file-storage/internal/auth"
+	"github.com/kgugunava/file-storage/internal/config"
 	"github.com/labstack/echo/v4"
-	"file-storage/internal/database"
-	"file-storage/internal/login"
+	"fmt"
 )
 
-func RunServer() {
+func RunServer(db database.Database) {
+	cfg, _ := config.Load()
+	fmt.Print("AAAAAA")
+	fmt.Print(cfg)
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Main Page")
 	})
-	e.POST("/login", loginUser)
-	e.Logger.Fatal(e.Start(":8010"))
-}
-
-func loginUser(c echo.Context) error {
-	user := c.FormValue("username")
-	password := c.FormValue("password")
-	currentUser := login.User{Login: user, Password: password}
-	// fmt.Println(user, password)
-	conn, err := database.ConnectToDatabase()
-	if err != nil {
-        log.Fatalf("Error : %v", err)
-    }
-	database.AddUserToDatabase(*conn, currentUser)
-	return c.String(http.StatusOK, user)
+	registerHandler := func(c echo.Context) error {
+		return register.RegisterUser(c, db)
+	}
+	authHandler := func(c echo.Context) error {
+		return auth.Authenticate(c, db)
+	}
+	e.POST("/register", registerHandler)
+	e.POST("/auth", authHandler)
+	e.Logger.Fatal(e.Start(cfg.Port))
 }

@@ -1,10 +1,11 @@
 package main
 
 import (
-	"file-storage/internal/app"
-	
+	"github.com/kgugunava/file-storage/internal/app"
+	"github.com/kgugunava/file-storage/internal/database"
 )
 
 func main() {
-	app.RunApp()
+	Db := new(database.Database)
+	app.RunApp(*Db)
 }
